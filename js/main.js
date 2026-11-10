@@ -118,6 +118,25 @@
     return .45;
   }
 
+  /* v5: reservation-prompt colour follows the background actually behind it.
+     Each scene declares its tone; the switch is delayed to the moment the
+     incoming background reaches the top-right corner (wipes / slides). */
+  const toneOf = s => (s >= 4 && s <= 7) || s === 11 ? 'dark' : 'light';
+  function toneDelay(prev, next) {
+    if (prev < 0) return 0;
+    if (prev <= 3 && next >= 4 && next <= 7) return prev === 0 ? .9 : .75;   // dark wipe enters from the right
+    if (prev >= 4 && prev <= 7 && next <= 3) return .35;                     // dark wipe leaves
+    if (prev >= 4 && prev <= 7 && next >= 8) return next === 11 ? 0 : .95;   // light page slides up, covers the top last
+    if (prev >= 8 && next >= 4 && next <= 7) return .15;                     // page slides away, dark shows at the top first
+    return 0;                                                                // footer dim / same-tone moves
+  }
+  function setTone(prev, next) {
+    const dark = toneOf(next) === 'dark';
+    if (dark === body.classList.contains('tone-dark')) return;
+    root.style.setProperty('--tone-delay', toneDelay(prev, next) + 's');
+    body.classList.toggle('tone-dark', dark);
+  }
+
   function go(next) {
     next = Math.max(0, Math.min(TOTAL - 1, next));
     if (next === cur || locked) return;
@@ -129,6 +148,8 @@
     body.classList.add('s-' + next,
       next === 0 ? 'g-intro' : next <= 3 ? 'g-moment' : next <= 7 ? 'g-brand' : 'g-pages');
     body.dataset.dir = next > prev ? 'down' : 'up';
+    setTone(prev, next);
+    document.dispatchEvent(new CustomEvent('step', { detail: { prev, next } }));
     // one-off entrance choreographies
     body.classList.toggle('enter-moment', prev === 0 && next === 1);
     body.classList.toggle('enter-brand', prev >= 0 && prev <= 3 && next === 4);
@@ -245,13 +266,13 @@
   /* ---------- 8. start once fonts are ready (no flash of fallback glyphs) ---------- */
   /* ---------- 8b. activity slider: cards loop, leaving card blurs out, arriving card blurs in ---------- */
   const xTrack = document.querySelector('.x-track');
-  const X_STEP = 505 + 50;
+  const X_STEP = 400 + 50;
   const EASE = 'cubic-bezier(.65,0,.35,1)';
   const blurOut = [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(14px)' }];
   const blurIn = [{ opacity: 0, filter: 'blur(14px)', transform: 'translateX(40px)' }, { opacity: 1, filter: 'blur(0px)', transform: 'none' }];
   let xBusy = false;
   function slideX(dir) {
-    if (xBusy || cur < 10) return;
+    if (xBusy || cur !== 10) return;
     xBusy = true;
     if (dir > 0) {
       const first = xTrack.firstElementChild;
@@ -274,8 +295,29 @@
       };
     }
   }
-  document.querySelector('.x-next').addEventListener('click', () => slideX(1));
-  document.querySelector('.x-prev').addEventListener('click', () => slideX(-1));
+  // v5: cards rotate on their own, one card per step; manual arrows / hover pause the rotation
+  const X_AUTO = 3800;
+  let xTimer = null, xHover = false;
+  function scheduleX() {
+    clearTimeout(xTimer);
+    xTimer = setTimeout(() => {
+      if (cur === 10 && !xHover && !document.hidden) slideX(1);
+      scheduleX();
+    }, X_AUTO);
+  }
+  scheduleX();
+  // entering the activity page: show the design order again and give the entrance time before the first move
+  const xOrder = [...xTrack.children];
+  document.addEventListener('step', ({ detail: { prev, next } }) => {
+    if (next !== 10) return;
+    if (prev !== 11 && !xBusy) xOrder.forEach(c => xTrack.appendChild(c));
+    scheduleX();
+  });
+  const xView = document.querySelector('.x-view');
+  xView.addEventListener('mouseenter', () => { xHover = true; });
+  xView.addEventListener('mouseleave', () => { xHover = false; scheduleX(); });
+  document.querySelector('.x-next').addEventListener('click', () => { slideX(1); scheduleX(); });
+  document.querySelector('.x-prev').addEventListener('click', () => { slideX(-1); scheduleX(); });
 
   /* ---------- 9. MOBILE SITE (normal scroll page, Figma "mobile") ---------- */
   const ms = document.getElementById('msite');

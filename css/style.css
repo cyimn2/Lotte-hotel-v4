@@ -114,8 +114,8 @@ ol, ul { list-style: none; }
 .cd span.out { opacity: 0; filter: blur(14px); transform: translate(-50%, -18px); }
 .cc { font-size: 93px; font-weight: 100; font-family: "Old Standard TT", serif; transform: translateY(-8px); }
 
-.cta { position: absolute; left: calc(100% - 154px); top: 51px; width: 104px; height: 34px; font-size: 14px; line-height: 20px; margin-top: -3px; color: #000; transition: color .8s ease; }
-.cta-arrow { position: absolute; left: 81px; top: 15px; width: 16.7px; height: 9.7px; background: url("../assets/arrow-right-dark.svg") no-repeat center / contain; transition: transform .4s var(--ease); }
+.cta { position: absolute; left: calc(100% - 154px); top: 51px; width: 104px; height: 34px; font-size: 14px; line-height: 20px; margin-top: -3px; color: var(--cta-ink, #000); transition: color .7s ease var(--tone-delay, 0s); }
+.cta-arrow { position: absolute; left: 81px; top: 15px; width: 16.7px; height: 9.7px; background: currentColor; -webkit-mask: url("../assets/arrow-right-dark.svg") no-repeat center / contain; mask: url("../assets/arrow-right-dark.svg") no-repeat center / contain; transition: transform .4s var(--ease); }
 .cta:hover .cta-arrow { transform: translateX(5px); }
 .cta-box {
   position: absolute; left: calc(100% - 154px); top: 102px; width: 97px; height: 38px;
@@ -146,8 +146,8 @@ body:not(.s-0) .cta-box { opacity: 1; transform: none; }
 .g-brand .logo-w { opacity: 1; }
 .g-brand .logo-b { opacity: 0; }
 .g-brand .clock { color: #fff; opacity: .3; }
-.g-brand .cta { color: #fff; }
-.g-brand .cta-arrow { background-image: url("../assets/arrow-right-light.svg"); }
+/* v5: the reservation prompt takes its ink from whatever sits behind it (set per scene in JS, timed to the wipe) */
+.tone-dark { --cta-ink: #fff; }
 .g-brand .ham i { background: #fff; opacity: .4; }
 .g-brand .copy { color: #fff; opacity: .5; }
 .g-pages .ham i { opacity: .4; }
@@ -326,18 +326,18 @@ body:not(.s-0) .cta-box { opacity: 1; transform: none; }
 .r-btn span { position: relative; }
 
 /* lotte hotel activity (experiences) */
-.x-title { position: absolute; left: 704px; top: 208px; font-family: var(--ogg); font-weight: 400; font-size: 72px; line-height: 1; letter-spacing: .72px; color: var(--brown); text-transform: lowercase; white-space: nowrap; }
+.x-title { position: absolute; left: 760px; top: 208px; font-family: var(--ogg); font-weight: 400; font-size: 72px; line-height: 1; letter-spacing: .72px; color: var(--brown); text-transform: lowercase; white-space: nowrap; }
 .x-title .ln { display: block; }
 .x-title .ln + .ln { margin-top: -2px; }
-.x-desc { left: 704px; top: 386px; }
-.x-arrows { position: absolute; left: 1646px; top: 408px; width: 117.426px; height: 26.713px; }
+.x-desc { left: 760px; top: 386px; }
+.x-arrows { position: absolute; left: 1493.3px; top: 397.6px; width: 117.426px; height: 26.713px; }
 .x-arrows img { width: 100%; height: 100%; }
 .x-arrows button { position: absolute; top: -12px; width: 56px; height: 50px; }
 .x-prev { left: -4px; } .x-next { right: -4px; }
-.x-view { position: absolute; left: 152.5px; top: 489px; width: 1615px; height: 420px; }
+.x-view { position: absolute; left: 310px; top: 459px; width: 1300px; height: 420px; overflow: hidden; }
 .x-track { display: flex; gap: 50px; }
-.x-col { flex: none; width: 505px; display: flex; flex-direction: column; gap: 43px; white-space: nowrap; }
-.x-img { position: relative; width: 505px; height: 250px; overflow: hidden; }
+.x-col { flex: none; width: 400px; display: flex; flex-direction: column; gap: 43px; white-space: nowrap; }
+.x-img { position: relative; width: 400px; height: 245px; overflow: hidden; }
 .x-img img { position: absolute; max-width: none; object-fit: cover; transition: transform 1.2s var(--ease); }
 .x-col:hover .x-img img { transform: scale(1.05); }
 .x-col h3 { font-size: 20px; font-weight: 500; line-height: 1; color: #444; }
